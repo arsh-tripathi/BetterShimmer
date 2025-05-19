@@ -1,0 +1,3 @@
+displayName = Better Shimmer
+author = Vortex0911
+version = 0.1

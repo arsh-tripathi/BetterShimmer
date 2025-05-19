@@ -1,0 +1,11 @@
+Better Shimmer
+Version: {ModVerion}
+tMLVersion: {tMLVersion}
+
+Better Shimmer mod improves your shimmer experience by adding QOL features.
+
+Planned Features:
+- Add a config setup to easily add shimmer recipes
+- Add a extractinator based station to quickly shimmer objects
+- Possibly allow recipe based decrafting when near shimmer, by crafting new shimmer bags, which open to give back crafting components
+- Integration with magic storage and expanding the previous feature to shimmer in a bottle being as valid near shimmer station
