@@ -11,3 +11,50 @@ Items: {
 			'''
 	}
 }
+
+Configs: {
+	BetterShimmerConfig: {
+		DisplayName: Better Shimmer Config
+		Headers.ConfigLocation: Config Location Header
+
+		configPath: {
+			Label: config Path
+			Tooltip: ""
+		}
+	}
+
+	BetterShimmerClientConfig: {
+		DisplayName: Better Shimmer Client Config
+		Headers.ConfigLocation: Config Location Header
+
+		configPath: {
+			Label: config Path
+			Tooltip: ""
+		}
+
+		ConfigPath: {
+			Label: Config Path
+			Tooltip: ""
+		}
+	}
+
+	BetterShimmerServerConfig: {
+		DisplayName: Better Shimmer Server Config
+		Headers.ConfigLocation: Config Location Header
+
+		configPath: {
+			Label: config Path
+			Tooltip: ""
+		}
+
+		AllowUserConfigs: {
+			Label: Allow User Configs
+			Tooltip: ""
+		}
+
+		DisallowUserConfigs: {
+			Label: Disallow User Configs
+			Tooltip: ""
+		}
+	}
+}
