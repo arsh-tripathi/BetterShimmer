@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using log4net;
 using log4net.Repository.Hierarchy;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Terraria;
 using Terraria.ID;
 using Terraria.IO;
@@ -12,8 +15,6 @@ using Terraria.ModLoader.Config;
 
 namespace BetterShimmer
 {
-
-
 	public static class Config
 	{
 		public static bool isConfigLoaded = false;
@@ -41,9 +42,11 @@ namespace BetterShimmer
 			{
 				Configuration.Get("Name", ref Name);
 				Configuration.Get("DirtMap", ref DirtShimmerResult);
-				string mappingsString = Configuration.Get("ShimmerMappings", "").ToString();
-				ShimmerMappings = mappingsString.Split(',').Select(s => int.TryParse(s, out int val) ? val : 0)
-                              .ToArray();
+				JArray arr = new JArray{};
+				Configuration.Get("ShimmerMappings", ref arr);
+				ShimmerMappings = arr.ToObject<int[]>();
+				log4net.ILog log = LogManager.GetLogger(nameof(BetterShimmer));
+				// log.Debug($"Got {test[0]}");
 				return true;
 			}
 			return false;
@@ -55,7 +58,7 @@ namespace BetterShimmer
 			Configuration.Clear();
 			Configuration.Put("Name", "test");
 			Configuration.Put("DirtMap", ItemID.TerraBlade);
-			Configuration.Put("ShimmerMappings", string.Join(",", testMappings));
+			Configuration.Put("ShimmerMappings", testMappings);
 			Configuration.Save();
 			ReadConfig();
 		}
@@ -86,5 +89,11 @@ namespace BetterShimmer
 
 		[DefaultValue(false)]
 		public bool DisallowUserConfigs = false;
+
+		[DefaultValue(true)]
+		public bool AllowMimicItemTransmutation = true;
+
+		[DefaultValue(true)]
+		public bool AllowBossDropCycling = true;
 	}
 }

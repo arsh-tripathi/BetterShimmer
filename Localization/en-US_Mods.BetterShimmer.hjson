@@ -56,5 +56,15 @@ Configs: {
 			Label: Disallow User Configs
 			Tooltip: ""
 		}
+
+		AllowMimicItemTransmutation: {
+			Label: Allow Mimic Item Transmutation
+			Tooltip: ""
+		}
+
+		AllowBossDropCycling: {
+			Label: Allow Boss Drop Cycling
+			Tooltip: ""
+		}
 	}
 }
