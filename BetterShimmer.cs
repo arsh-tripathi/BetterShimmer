@@ -14,19 +14,25 @@ namespace BetterShimmer
 {
 	public class ItemOverride : GlobalItem
 	{
+
+		private static void Convert(int[][] arr)
+		{
+			if (arr == null) return;
+			foreach (int[] map in arr) ItemID.Sets.ShimmerTransformToItem[map[0]] = map[1];
+		}
+
 		public override void SetStaticDefaults()
 		{
 			// Look up config to get values
 			log4net.ILog log = LogManager.GetLogger(nameof(BetterShimmer));
-			log.Debug("Entering static default...");
-			int[] convert = ItemID.Sets.ShimmerTransformToItem;
+			log.Debug("Mapping Shimmer Transforms...");
 			if (!Config.isConfigLoaded) Config.Load();
-			convert[ItemID.DirtBlock] = Config.DirtShimmerResult;
-			for (int i = 0; i < Config.ShimmerMappings.Length; i += 2)
-			{
-				convert[Config.ShimmerMappings[i]] = Config.ShimmerMappings[i+1];
-				convert[ItemID.Wood] = ItemID.Acorn;
-			}
+			Convert(Config.ShimmerMappings);
+			if (BetterShimmerConfig.Instance.AllowBiomeMimicSwap) Convert(Config.BiomeMimicSwap);
+			// if (BetterShimmerConfig.Instance.AllowBossDropCycling) Convert(Config.);
+			if (BetterShimmerConfig.Instance.AllowHallowMimicCycling) Convert(Config.HallowMimicCycle);
+			if (BetterShimmerConfig.Instance.AllowHardModeMimicDropCycling) Convert(Config.HMMimicCycle);
+			if (BetterShimmerConfig.Instance.AllowPHMMimicCycling) Convert(Config.PHMMimicCycle);
 		}
 	}
 	// Please read https://github.com/tModLoader/tModLoader/wiki/Basic-tModLoader-Modding-Guide#mod-skeleton-contents for more information about the various files in a mod.
@@ -34,7 +40,6 @@ namespace BetterShimmer
 	{
 		public const string configPath = $"{nameof(BetterShimmer)}/Config/";
 		public static int BetterShimmerCustomCurrencyId;
-		int[] overrides;
 
 		public override void Load()
 		{
@@ -44,7 +49,8 @@ namespace BetterShimmer
 
 		public override void Unload()
 		{
-			// Add original recipes back here, should probably save them somewhere
+			// Fortunately, it seems reloading restores the Shimmer transforms.
+			// Therefore don't need to reset the tranformation array to original state.
 		}
 
 		public override void PostSetupContent()
@@ -53,6 +59,13 @@ namespace BetterShimmer
 
 		public override object Call(params object[] args)
 		{
+			// This will allow other mods to interact with this mod and
+			// retrieve information 
+			// As for adding mappings, it looks like this method will be 
+			// too slow to be able to intercept before the global items
+			// SetStaticDefaults method is called. So possibly only pass
+			// information through config files, and allow mod specific
+			// config files.
 			return base.Call(args);
 		}
 	}

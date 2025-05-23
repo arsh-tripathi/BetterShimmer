@@ -21,6 +21,36 @@ Configs: {
 			Label: config Path
 			Tooltip: ""
 		}
+
+		AllowBiomeMimicSwap: {
+			Label: Allow Biome Mimic Swap
+			Tooltip: ""
+		}
+
+		AllowBossDropCycling: {
+			Label: Allow Boss Drop Cycling
+			Tooltip: ""
+		}
+
+		AllowHallowMimicCycling: {
+			Label: Allow Hallow Mimic Cycling
+			Tooltip: ""
+		}
+
+		AllowHardModeMimicDropCycling: {
+			Label: Allow Hard Mode Mimic Drop Cycling
+			Tooltip: ""
+		}
+
+		AllowPHMMimicCycling: {
+			Label: Allow P H M Mimic Cycling
+			Tooltip: ""
+		}
+
+		ConfigName: {
+			Label: Config Name
+			Tooltip: ""
+		}
 	}
 
 	BetterShimmerClientConfig: {
