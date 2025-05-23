@@ -33,6 +33,13 @@ namespace BetterShimmer
 			if (BetterShimmerConfig.Instance.AllowHallowMimicCycling) Convert(Config.HallowMimicCycle);
 			if (BetterShimmerConfig.Instance.AllowHardModeMimicDropCycling) Convert(Config.HMMimicCycle);
 			if (BetterShimmerConfig.Instance.AllowPHMMimicCycling) Convert(Config.PHMMimicCycle);
+			if (BetterShimmerConfig.Instance.AllowBossDropCycling) Convert(Config.BossDropsCycle);
+			if (Config.ModTransforms == null) return;
+			foreach (BetterShimmerModTransforms Mod in Config.ModTransforms)
+			{
+				ModLoader.TryGetMod(Mod.ModName, out Mod m); // Check if mod is loaded
+				if (m != null) Convert(Mod.Transforms);
+			}
 		}
 	}
 	// Please read https://github.com/tModLoader/tModLoader/wiki/Basic-tModLoader-Modding-Guide#mod-skeleton-contents for more information about the various files in a mod.

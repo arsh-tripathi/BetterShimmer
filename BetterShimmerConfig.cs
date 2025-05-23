@@ -6,6 +6,7 @@ using System.Linq;
 using Humanizer;
 using log4net;
 using log4net.Repository.Hierarchy;
+using Microsoft.CodeAnalysis.Emit;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Terraria;
@@ -16,6 +17,21 @@ using Terraria.ModLoader.Config;
 
 namespace BetterShimmer
 {
+	// This class is the structure to add shimmer transformations
+	// into the config for other mods
+	// These can be put in the shimmer mappings as well, 
+	// however this adds the benefit of checking if that 
+	// particular mod is loaded before adding the mappings
+	public class BetterShimmerModTransforms
+	{
+		public string ModName = "DefaultModName";
+		public int[][] Transforms;
+		public BetterShimmerModTransforms(string name, int[][] transformations)
+		{
+			this.ModName = name;
+			this.Transforms = transformations;
+		}
+	}
 	public static class Config
 	{
 		public static bool isConfigLoaded = false;
@@ -27,6 +43,8 @@ namespace BetterShimmer
 		public static int[][] HallowMimicCycle = InitHallowMimic();
 		public static int[][] HMMimicCycle = InitHMMimic();
 		public static int[][] PHMMimicCycle = InitPHMMimic();
+		public static int[][] BossDropsCycle = InitBossDrops();
+		public static BetterShimmerModTransforms[] ModTransforms;
 		#endregion
 
 		static string ConfigPath = Path.Combine(Main.SavePath, "Mod Configs", "BetterShimmer", $"{BetterShimmerConfig.Instance.ConfigName}.json");
@@ -52,6 +70,8 @@ namespace BetterShimmer
 				GetArray("HallowMimic", ref HallowMimicCycle);
 				GetArray("HMMimic", ref HMMimicCycle);
 				GetArray("PHMMimic", ref PHMMimicCycle);
+				GetArray("BossDrops", ref BossDropsCycle);
+				GetArray("ModTransforms", ref ModTransforms);
 				return true;
 			}
 			return false;
@@ -75,6 +95,8 @@ namespace BetterShimmer
 			Configuration.Put("HallowMimic", HallowMimicCycle);
 			Configuration.Put("HMMimic", HMMimicCycle);
 			Configuration.Put("PHMMimic", PHMMimicCycle);
+			Configuration.Put("BossDrops", BossDropsCycle);
+			Configuration.Put("ModTransforms", ModTransforms);
 			Configuration.Save();
 			ReadConfig();
 		}
@@ -96,6 +118,14 @@ namespace BetterShimmer
 				retVal.Add([elements[i], elements[(i+1)%elements.Length]]);
 			}
 			return retVal.ToArray();
+		}
+
+		static int[][] Combine(params int[][][] Arrays)
+		{
+			List<int []> result = [];
+			foreach (int[][] element in Arrays)
+				foreach (int[] map in element) result.Add(map);
+			return result.ToArray();
 		}
 
 		static int[][] InitBiomeMimics()
@@ -143,7 +173,7 @@ namespace BetterShimmer
 				ItemID.IceBow,
 				ItemID.FlowerofFrost
 			]);
-			return Normal.Concat(Ice).ToArray();
+			return Combine(Normal, Ice);
 		}
 
 		static int[][] InitPHMMimic()
@@ -154,7 +184,7 @@ namespace BetterShimmer
 				ItemID.CloudinaBottle,
 				ItemID.HermesBoots,
 				ItemID.Mace,
-				ItemID.ShoeSpikes,
+				ItemID.ShoeSpikes
 			]);
 			int[][] Ice = CreateCycle([
 				ItemID.ToySled,
@@ -163,9 +193,154 @@ namespace BetterShimmer
 				ItemID.IceSkates,
 				ItemID.IceBow,
 				ItemID.BlizzardinaBottle,
-				ItemID.FlurryBoots,
+				ItemID.FlurryBoots
 			]);
-			return Normal.Concat(Ice).ToArray();
+			return Combine(Normal, Ice);
+		}
+
+		static int[][] InitBossDrops()
+		{
+			int[][] QueenBee = CreateCycle([
+				ItemID.BeeGun,
+				ItemID.BeeKeeper,
+				ItemID.BeesKnees
+			]);
+			int[][] DeerclopsWeapons = CreateCycle([
+				ItemID.PewMaticHorn,
+				ItemID.WeatherPain,
+				ItemID.HoundiusShootius,
+				ItemID.LucyTheAxe
+			]);
+			int[][] DeerclopsOthers = CreateCycle([
+				ItemID.ChesterPetItem,
+				ItemID.Eyebrella,
+				ItemID.DontStarveShaderItem
+			]);
+			int[][] WallOfFlesh = CreateCycle([
+				ItemID.BreakerBlade,
+				ItemID.ClockworkAssaultRifle,
+				ItemID.LaserRifle,
+				ItemID.FireWhip
+			]);
+			int[][] QueenSlime = CreateCycle([
+				ItemID.Smolstar,
+				ItemID.QueenSlimePetItem,
+				ItemID.QueenSlimeHook
+			]);
+			int[][] Plantera = CreateCycle([
+				ItemID.GrenadeLauncher,
+				ItemID.VenusMagnum,
+				ItemID.NettleBurst,
+				ItemID.LeafBlower,
+				ItemID.FlowerPow,
+				ItemID.WaspGun,
+				ItemID.Seedler
+			]);
+			int[][] Golem = CreateCycle([
+				ItemID.Stynger,
+				ItemID.PossessedHatchet,
+				ItemID.SunStone,
+				ItemID.EyeoftheGolem,
+				ItemID.HeatRay,
+				ItemID.StaffofEarth,
+				ItemID.GolemFist
+			]);
+			int[][] DukeFishron = CreateCycle([
+				ItemID.BubbleGun,
+				ItemID.Flairon,
+				ItemID.RazorbladeTyphoon,
+				ItemID.TempestStaff,
+				ItemID.Tsunami,
+			]);
+			int[][] EmpressOfLight = CreateCycle([
+				ItemID.FairyQueenMagicItem,
+				ItemID.PiercingStarlight,
+				ItemID.RainbowWhip,
+				ItemID.FairyQueenRangedItem,
+			]);
+			int[][] MoonLord = CreateCycle([
+				ItemID.Meowmere,
+				ItemID.Terrarian,
+				ItemID.StarWrath,
+				ItemID.SDMG,
+				ItemID.Celeb2,
+				ItemID.LastPrism,
+				ItemID.LunarFlareBook,
+				ItemID.RainbowCrystalStaff,
+				ItemID.MoonlordTurretStaff,
+			]);
+			int[][] Betsy = CreateCycle([
+				ItemID.DD2BetsyBow,
+				ItemID.MonkStaffT3,
+				ItemID.ApprenticeStaffT3,
+				ItemID.DD2SquireBetsySword,
+			]);
+			int[][] FlyingDutchman = CreateCycle([
+				ItemID.LuckyCoin,
+				ItemID.DiscountCard,
+				ItemID.PirateStaff,
+				ItemID.GoldRing,
+			]);
+			int[][] MourningWood = CreateCycle([
+				ItemID.SpookyHook,
+				ItemID.SpookyTwig,
+				ItemID.StakeLauncher,
+				ItemID.CursedSapling,
+				ItemID.NecromanticScroll,
+			]);
+			int[][] Pumpking = CreateCycle([
+				ItemID.CandyCornRifle,
+				ItemID.JackOLanternLauncher,
+				ItemID.BlackFairyDust,
+				ItemID.TheHorsemansBlade,
+				ItemID.BatScepter,
+				ItemID.RavenStaff,
+				ItemID.ScytheWhip,
+				ItemID.SpiderEgg,
+			]);
+			int[][] Everscream = CreateCycle([
+				ItemID.ChristmasTreeSword,
+				ItemID.ChristmasHook,
+				ItemID.Razorpine,
+				ItemID.FestiveWings,
+			]);
+			int[][] SantaNK1 = CreateCycle([
+				ItemID.ElfMelter,
+				ItemID.ChainGun,
+			]);
+			int[][] IceQueen = CreateCycle([
+				ItemID.BlizzardStaff,
+				ItemID.SnowmanCannon,
+				ItemID.NorthPole,
+			]);
+			int[][] MartianSaucer = CreateCycle([
+				ItemID.Xenopopper,
+				ItemID.XenoStaff,
+				ItemID.LaserMachinegun,
+				ItemID.ElectrosphereLauncher,
+				ItemID.InfluxWaver,
+				ItemID.CosmicCarKey,
+			]);
+			return Combine(
+				QueenBee,
+				DeerclopsWeapons,
+				DeerclopsOthers,
+				WallOfFlesh,
+				QueenSlime,
+				Plantera,
+				Golem,
+				DukeFishron,
+				EmpressOfLight,
+				MoonLord,
+				Betsy,
+				FlyingDutchman,
+				MourningWood,
+				Pumpking,
+				Everscream,
+				SantaNK1,
+				IceQueen,
+				MartianSaucer
+			);
 		}
 		#endregion
 	}
